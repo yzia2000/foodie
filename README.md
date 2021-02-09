@@ -1,8 +1,5 @@
 # Template Project
 
-## Core Dev Team
-- [Mohammad Yousuf Minhaj Zia](https://github.com/yzia2000)
-
 ## Project Heirarchy
 ```
 |- root

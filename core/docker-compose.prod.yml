@@ -13,7 +13,7 @@ services:
             - ./dbscripts:/docker-entrypoint-initdb.d
 
     api:
-        image: yzia2000/zims-classroom:latest
+        image: yzia2000/foodie-api:latest
         environment:
             - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
         build:
