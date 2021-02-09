@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+    db:
+        image: postgres:13-alpine
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_DB=${POSTGRES_DB}
+        container_name: db
+        ports: 
+            - '5432:5432'
+        volumes:
+            - ./dbscripts:/docker-entrypoint-initdb.d
+
+    api:
+        image: yzia2000/zims-classroom:latest
+        environment:
+            - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+        build:
+            context: .
+        container_name: api
+        depends_on:
+            - db
+        ports:
+            - '5000:5000'
