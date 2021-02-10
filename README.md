@@ -1,16 +1,17 @@
-# Template Project
+# Foodie
 
 ## Project Heirarchy
 ```
 |- root
-|---- frontend
-|---- backend
+|---- core
+|---- web
 |---- README.md
 |---- CONTRIBUTING.md
 ```
 
 ## Branches
 - main - development branch
+- staging - staging branch
 - release - release branch
 
 ## Build and Deployment Servers
@@ -27,11 +28,7 @@
 - Jest - Testing
 - Selenium - GUI Testing Automation (E2E testing)
 
-## Docker containers
-- Postgres container
-- Node container
-
-## Continuous Integration and Continuous Deployment
+## Deployment
 - Netlify - Static frontend deployment (Migrate to heroku for Server Side Rendering when migrating to NextJS)
 - Heroku - Postgres and Node Express REST API deployment
 
