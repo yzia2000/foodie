@@ -43,13 +43,29 @@ export const listRestaurantsByDate = async (
   res: Response
 ): Promise<void> => {
   try {
-    const date: Date = new Date(req.params.date);
-    const results = await pool.query(
-      `SELECT DISTINCT R.name 
-        FROM Restaurants R NATURAL JOIN Opening_Hours O 
-        WHERE O.weekday = $1 and O.end_time >= $2 and O.start_time <= $2`,
-      [date.getUTCDay(), date]
-    );
+    let { date: dateString, time: timeString } = req.query;
+    if (dateString === undefined) {
+      res.status(402).send('Specify date query');
+    } 
+
+    let results: QueryResult;
+    if (timeString === undefined) {
+      let date: Date = new Date(dateString + "");
+      results = await pool.query(
+        `SELECT DISTINCT R.name, O.start_time, O.end_time
+          FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id 
+          WHERE O.weekday = $1`,
+        [date.getUTCDay()]
+      );
+    } else {
+      let date: Date = new Date(dateString + "");
+      results = await pool.query(
+        `SELECT DISTINCT R.name, O.start_time, O.end_time
+          FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id 
+          WHERE O.weekday = $1 and O.end_time >= $2 and O.start_time <= $2`,
+        [date.getUTCDay(), timeString]
+      );
+    }
     if (results.rowCount === 0) {
       res.status(400).send('No restaurants found');
     } else {

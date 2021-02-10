@@ -12,7 +12,7 @@ import {
 const restaurants: Router = express.Router();
 
 restaurants.get('/', listByName);
-restaurants.get('/date', listRestaurantsByDate);
+restaurants.get('/open', listRestaurantsByDate);
 restaurants.get('/hours', listRestaurantsByAvailability);
 restaurants.get('/dishes/:number', listRestaurantsByDishPriceRange);
 
