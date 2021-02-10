@@ -6,39 +6,25 @@ export const createTransaction = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const client = await pool.connect();
+  const client = await pool.connect()
   try {
-    const { itemId, userId, date = new Date().toLocaleDateString() } = req.body;
+    const { itemId, userId } = req.body;
 
-    await client.query('BEGIN');
-    const itemPriceQuery: QueryResult = await client.query(
-      'SELECT price FROM Items WHERE id = $1',
-      [itemId]
-    );
+    await client.query('BEGIN')
+    const itemPriceQuery: QueryResult = await client.query('SELECT price FROM Items WHERE id = $1', [itemId]);
     if (itemPriceQuery.rowCount === 0) {
-      throw new Error('Incorrect itemId');
-    }
-    const itemPrice = itemPriceQuery.rows[0].price;
-
-    const userUpdateQuery: QueryResult = await client.query(
-      'UPDATE Users SET cash_balance = cash_balance - $1 WHERE id = $2 RETURN *',
-      [itemPrice, userId]
-    );
-
-    if (userUpdateQuery.rowCount === 0) {
-      throw new Error('Incorrect userId');
     }
 
-    await client.query(
-      'INSERT INTO Transactions(user_id, item_id, date) VALUES($1, $2, $3)',
-      [userId, itemId, date]
-    );
-    await client.query('COMMIT');
+    const res = await client.query( 'INSERT INTO users(name) VALUES($1) RETURNING id', ['brianc'])
+    const insertPhotoText = 'INSERT INTO photos(user_id, photo_url) VALUES ($1, $2)'
+    const insertPhotoValues = [res.rows[0].id, 's3.bucket.foo']
+    await client.query(insertPhotoText, insertPhotoValues)
+    await client.query('COMMIT')
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query('ROLLBACK')
     res.status(403).send(error.Message);
   } finally {
-    client.release();
+    client.release()
   }
 };
 
@@ -51,9 +37,7 @@ export const listUsersByAmount = async (
     const dollars = req.params.dollars;
 
     if (upperBound === undefined || lowerBound === undefined) {
-      res
-        .status(400)
-        .send('Please specify date upperBound and lowerBound in query');
+      res.status(400).send('Please specify date upperBound and lowerBound in query');
     }
 
     let results: QueryResult;
@@ -116,7 +100,8 @@ export const listTopRestaurantsByTransaction = async (
           LIMIT $2`,
         [upperBound, numberOfRestaurants]
       );
-    } else if (lowerBound === undefined) {
+    } else if (lowerBound === undefined)
+    {
       results = await pool.query(
         `SELECT R.id, R.name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
@@ -180,7 +165,8 @@ export const listTopUsersByTransaction = async (
           LIMIT $2`,
         [upperBound, numberOfUsers]
       );
-    } else if (lowerBound === undefined) {
+    } else if (lowerBound === undefined)
+    {
       results = await pool.query(
         `SELECT U.id, U.name, foo.transaction_amount
           FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
