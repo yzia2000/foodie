@@ -5,7 +5,6 @@ import {
   addDishToMenu,
   listRestaurantsByDate,
   listRestaurantsByAvailability,
-  listRestaurantsByUnavailability,
   listRestaurantsByDishPriceRange,
   listByName
 } from '../handlers/restaurants';
@@ -14,8 +13,7 @@ const restaurants: Router = express.Router();
 
 restaurants.get('/', listByName);
 restaurants.get('/date', listRestaurantsByDate);
-restaurants.get('/hours/more', listRestaurantsByAvailability);
-restaurants.get('/hours/less', listRestaurantsByUnavailability);
+restaurants.get('/hours', listRestaurantsByAvailability);
 restaurants.get('/dishes/:number', listRestaurantsByDishPriceRange);
 
 restaurants.post('/', createRestaurant);

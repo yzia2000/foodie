@@ -60,58 +60,45 @@ export const listRestaurantsByDate = async (
   }
 };
 
-export const listRestaurantsByUnavailability = async (
-  req: Request,
-  res: Response
-): Promise<any> => {
-  try {
-    const { week, day } = req.query;
-    let results: QueryResult;
-    if (week === undefined && day === undefined) {
-      return res.status(400).send('Please specify week or day in the query');
-    } else if (week === undefined) {
-      results = await pool.query(
-        `SELECT DISTINCT R.name
-          FROM Restaurants R NATURAL JOIN Opening_Hours O
-          WHERE O.start_time - O.end_time <= $1`, [day]);
-    } else {
-      results = await pool.query(
-        `SELECT DISTINCT R.name
-          FROM Restaurants R NATURAL JOIN Opening_Hours O
-          GROUP BY R.id
-          WHERE SUM(O.start_time - O.end_time) <= $1`, [day]);
-    }
-
-    if (results.rowCount === 0) {
-      return res.status(400).send('No results found');
-    } else {
-      return res.json(results.rows);
-    }
-  } catch (error) {
-    res.status(403).send('Something went wrong');
-  }
-};
-
 export const listRestaurantsByAvailability = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
-    const { week, day } = req.query;
+    const { week, day, type } = req.query;
     let results: QueryResult;
-    if (week === undefined && day === undefined) {
-      return res.status(400).send('Please specify week or day in the query');
-    } else if (week === undefined) {
-      results = await pool.query(
-        `SELECT DISTINCT R.name
-          FROM Restaurants R NATURAL JOIN Opening_Hours O
-          WHERE O.start_time - O.end_time >= $1`, [day]);
+    if (type === undefined || type === 'more') {
+      if (week === undefined && day === undefined) {
+        return res.status(400).send('Please specify week or day in the query');
+      } else if (week === undefined) {
+        results = await pool.query(
+          `SELECT DISTINCT R.name AS restaurant_name
+            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
+            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) >= $1`, [day]);
+      } else {
+        results = await pool.query(
+          `SELECT foo.restaurant_name
+            FROM (SELECT R.name AS restaurant_name, SUM(EXTRACT(hours FROM (O.end_time - O.start_time))) AS hours
+            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
+            GROUP BY R.id) foo
+            WHERE foo.hours >= $1`, [week]);
+      }
     } else {
-      results = await pool.query(
-        `SELECT DISTINCT R.name
-          FROM Restaurants R NATURAL JOIN Opening_Hours O
-          GROUP BY R.id
-          WHERE SUM(O.start_time - O.end_time) >= $1`, [day]);
+      if (week === undefined && day === undefined) {
+        return res.status(400).send('Please specify week or day in the query');
+      } else if (week === undefined) {
+        results = await pool.query(
+          `SELECT DISTINCT R.name AS restaurant_name
+            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
+            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) <= $1`, [day]);
+      } else {
+        results = await pool.query(
+          `SELECT foo.restaurant_name
+            FROM (SELECT R.name AS restaurant_name, SUM(EXTRACT(hours FROM (O.end_time - O.start_time))) AS hours
+            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
+            GROUP BY R.id) foo
+            WHERE foo.hours <= $1`, [week]);
+      }
     }
 
     if (results.rowCount === 0) {
@@ -197,7 +184,6 @@ export const listByName = async (req: Request, res: Response): Promise<any> => {
     if (restaurantName === undefined && dishName === undefined) {
       results = await pool.query('SELECT DISTINCT name FROM Restaurants');
     } else if (restaurantName === undefined) {
-      console.log(dishName);
       results = await pool.query(
         `SELECT foo.name AS dish_name FROM 
           (SELECT distinct name 
@@ -207,7 +193,6 @@ export const listByName = async (req: Request, res: Response): Promise<any> => {
         [dishName]
       );
     } else if (dishName === undefined) {
-      console.log(restaurantName);
       results = await pool.query(
         `SELECT foo.name AS restaurant_name FROM 
           (SELECT distinct name 
