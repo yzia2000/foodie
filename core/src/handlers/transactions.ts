@@ -8,7 +8,7 @@ export const createTransaction = async (
   res: Response
 ): Promise<void> => {
   try {
-    const opening: OpeningHour = req.body;
+    const opening  = req.body;
     await pool.query(
       'INSERT INTO Opening_Hours(restaurant_id, weekday, start_time, end_time) VALUES($1, $2, $3)',
       [opening.restaurant_id, opening.weekday, opening.start_time, opening.end_time]
@@ -114,52 +114,52 @@ export const listTopUsersByTransaction = async (
 ): Promise<void> => {
   try {
     const { upper: upperBound, lower: lowerBound } = req.query;
-    const numberOfDishes: string = req.params.number;
+    const numberOfUsers = req.params.number;
 
     let results: QueryResult;
     if (upperBound === undefined && lowerBound === undefined) {
       results = await pool.query(
-        `SELECT name 
-          FROM Restaurants 
-          WHERE id IN 
-            (SELECT restaurant_id 
-            FROM Items 
-            GROUP BY restaurant_id 
-            HAVING COUNT(restaurant_id) >= $1)`,
-        [numberOfDishes]
+        `SELECT U.id, U.name, foo.transaction_amount
+          FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY T.user_id) foo ON U.id = foo.user_id 
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $1`,
+        [numberOfUsers]
       );
     } else if (upperBound === undefined) {
       results = await pool.query(
-        `SELECT name FROM Restaurants 
-          WHERE id IN 
-            (SELECT restaurant_id 
-            FROM Items 
-            WHERE price >= $1 
-            GROUP BY restaurant_id 
-            HAVING COUNT(restaurant_id) >= $2)`,
-        [lowerBound, numberOfDishes]
+        `SELECT U.id, U.name, foo.transaction_amount
+          FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY T.user_id) foo ON U.id = foo.user_id 
+          WHERE T.date <= $1
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $2`,
+        [upperBound, numberOfUsers]
       );
     } else if (lowerBound === undefined)
     {
       results = await pool.query(
-        `SELECT name FROM Restaurants 
-          WHERE id IN 
-            (SELECT restaurant_id 
-            FROM Items 
-            WHERE price <= $1 
-            GROUP BY restaurant_id 
-            HAVING COUNT(restaurant_id) >= $2)`,
-        [upperBound, numberOfDishes]
+        `SELECT U.id, U.name, foo.transaction_amount
+          FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY T.user_id) foo ON U.id = foo.user_id 
+          WHERE T.date >= $1
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $2`,
+        [lowerBound, numberOfUsers]
       );
     } else {
       results = await pool.query(
-        `SELECT name FROM Restaurants 
-          WHERE id IN 
-            (SELECT restaurant_id 
-            FROM Items 
-            WHERE price >= $1 and price <= $2 
-            GROUP BY restaurant_id HAVING COUNT(restaurant_id) >= $3)`,
-        [lowerBound, upperBound, numberOfDishes]
+        `SELECT U.id, U.name, foo.transaction_amount
+          FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY T.user_id) foo ON U.id = foo.user_id 
+          WHERE T.date >= $1 and T.date <= $2
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $3`,
+        [lowerBound, upperBound, numberOfUsers]
       );
     }
 
