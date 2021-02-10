@@ -1,10 +1,10 @@
-export interface Restaurants {
+export interface Restaurant {
   id?: number,
   name: string,
   cashBalance: number
 }
 
-export interface Items {
+export interface Item {
   id?: number,
   restaurant_id: number,
   name: string,
@@ -12,7 +12,9 @@ export interface Items {
   price: number
 }
 
-export interface OpeningHours {
+export interface OpeningHour {
   weekday: string,
   restaurant_id: number,
+  start_time: string,
+  end_time: string
 }

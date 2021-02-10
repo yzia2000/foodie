@@ -1,13 +1,19 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../db';
-import { Restaurants } from '../types';
+import { Item, OpeningHour, Restaurant } from '../types';
 
 export const addOpeningHour = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
+    const opening: OpeningHour = req.body;
+    await pool.query(
+      'INSERT INTO Opening_Hours(restaurant_id, weekday, start_time, end_time) VALUES($1, $2, $3)',
+      [opening.restaurant_id, opening.weekday, opening.start_time, opening.end_time]
+    );
+    res.status(200).send('Opening hour added to restaurant');
   } catch (error) {
     res.status(403).send('Something went wrong');
   }
@@ -18,11 +24,12 @@ export const createRestaurant = async (
   res: Response
 ): Promise<void> => {
   try {
-    const restaurant: Restaurants = req.body;
-    await pool.query(
-      'INSERT INTO Restaurants(name, cash_balance) VALUES($1, $2)',
+    const restaurant: Restaurant = req.body;
+    const results = await pool.query(
+      'INSERT INTO Restaurants(name, cash_balance) VALUES($1, $2) RETURNING id',
       [restaurant.name, restaurant.cashBalance]
     );
+    res.status(200).json(results.rows);
   } catch (error) {
     res.status(403).send('Something went wrong');
   }
@@ -33,6 +40,12 @@ export const addDishToMenu = async (
   res: Response
 ): Promise<void> => {
   try {
+    const item: Item = req.body;
+    await pool.query(
+      'INSERT INTO Items(restaurant_id, name, price) VALUES($1, $2, $3)',
+      [item.restaurant_id, item.name, item.price]
+    );
+    res.status(200).send('Added item');
   } catch (error) {
     res.status(403).send('Something went wrong');
   }
