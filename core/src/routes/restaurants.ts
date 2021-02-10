@@ -6,13 +6,13 @@ import {
   listRestaurantsByDate,
   listRestaurantsByAvailability,
   listRestaurantsByDishPriceRange,
-  listRestaurantByName,
+  listByName,
   listDishByName
 } from '../handlers/restaurants';
 
 const restaurants: Router = express.Router();
 
-restaurants.get('/', listRestaurantByName);
+restaurants.get('/', listByName);
 restaurants.get('/dishes', listDishByName);
 restaurants.get('/date', listRestaurantsByDate);
 restaurants.get('/time', listRestaurantsByAvailability);
