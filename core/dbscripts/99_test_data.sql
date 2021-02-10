@@ -1,6 +1,6 @@
 BEGIN;
 INSERT INTO Restaurants(name, cash_balance) VALUES 
-('""Ulu Ocean Grill and Sushi Lounge', 4483.84),
+('Ulu Ocean Grill and Sushi Lounge', 4483.84),
 ('024 Grille', 4882.81),
 ('100% Mexicano Restaurant', 1320.19),
 ('100% de Agave', 4629.91);

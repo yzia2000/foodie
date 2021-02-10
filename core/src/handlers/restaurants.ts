@@ -141,7 +141,7 @@ export const listRestaurantsByDishPriceRange = async (
             (SELECT restaurant_id 
             FROM Items 
             GROUP BY restaurant_id 
-            HAVING COUNT(restaurant_id) > $1`,
+            HAVING COUNT(restaurant_id) >= $1)`,
         [numberOfDishes]
       );
     } else if (upperBound === undefined) {
@@ -152,8 +152,20 @@ export const listRestaurantsByDishPriceRange = async (
             FROM Items 
             WHERE price >= $1 
             GROUP BY restaurant_id 
-            HAVING COUNT(restaurant_id) > $2`,
+            HAVING COUNT(restaurant_id) >= $2)`,
         [lowerBound, numberOfDishes]
+      );
+    } else if (lowerBound === undefined)
+    {
+      results = await pool.query(
+        `SELECT name FROM Restaurants 
+          WHERE id IN 
+            (SELECT restaurant_id 
+            FROM Items 
+            WHERE price <= $1 
+            GROUP BY restaurant_id 
+            HAVING COUNT(restaurant_id) >= $2)`,
+        [upperBound, numberOfDishes]
       );
     } else {
       results = await pool.query(
@@ -162,7 +174,7 @@ export const listRestaurantsByDishPriceRange = async (
             (SELECT restaurant_id 
             FROM Items 
             WHERE price >= $1 and price <= $2 
-            GROUP BY restaurant_id HAVING COUNT(restaurant_id) > $3)`,
+            GROUP BY restaurant_id HAVING COUNT(restaurant_id) >= $3)`,
         [lowerBound, upperBound, numberOfDishes]
       );
     }
