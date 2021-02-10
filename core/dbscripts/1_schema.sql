@@ -21,4 +21,19 @@ CREATE TABLE Items(
   price float NOT NULL,
   unique(restaurant_id, name)
 );
+
+CREATE TABLE Users(
+  id SERIAL PRIMARY KEY,
+  cashBalance float NOT NULL,
+  name varchar(255)
+);
+
+CREATE TABLE Transactions(
+  id SERIAL PRIMARY KEY,
+  item_id int references Items(id) NOT NULL,
+  user_id int references Users(id) NOT NULL,
+  date timestamp NOT NULL,
+  unique(item_id, user_id, date)
+);
+
 COMMIT;
