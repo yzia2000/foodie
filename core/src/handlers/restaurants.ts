@@ -191,23 +191,22 @@ export const listRestaurantsByDishPriceRange = async (
 
 export const listByName = async (req: Request, res: Response): Promise<any> => {
   try {
-    const restaurantName = req.query.restaurant; // restaurant or item
-    const itemName = req.query.item; // restaurant or item
+    const { restaurant: restaurantName, dish: dishName } = req.query;
 
     let results: QueryResult;
-    if (restaurantName === undefined && itemName === undefined) {
+    if (restaurantName === undefined && dishName === undefined) {
       results = await pool.query('SELECT DISTINCT name FROM Restaurants');
     } else if (restaurantName === undefined) {
-      console.log(itemName);
+      console.log(dishName);
       results = await pool.query(
-        `SELECT foo.name AS item_name FROM 
+        `SELECT foo.name AS dish_name FROM 
           (SELECT distinct name 
           FROM Items) foo
           WHERE (foo.name <-> $1) < 0.95 
           ORDER BY (foo.name <-> $1)`,
-        [itemName]
+        [dishName]
       );
-    } else if (itemName === undefined) {
+    } else if (dishName === undefined) {
       console.log(restaurantName);
       results = await pool.query(
         `SELECT foo.name AS restaurant_name FROM 
@@ -219,11 +218,11 @@ export const listByName = async (req: Request, res: Response): Promise<any> => {
       );
     } else {
       results = await pool.query(
-        `SELECT R.name AS restaurant_name, I.name AS item_name
+        `SELECT R.name AS restaurant_name, I.name AS dish_name 
           FROM Restaurants R INNER JOIN Items I ON R.id = I.restaurant_id
           WHERE (R.name <-> $1) < 0.95 and (I.name <-> $2) < 0.95 
           ORDER BY (R.name <-> $1), (I.name <-> $2)`,
-        [restaurantName, itemName]
+        [restaurantName, dishName]
       );
     }
 
