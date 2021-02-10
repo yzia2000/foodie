@@ -62,40 +62,54 @@ export const listTopRestaurantsByTransaction = async (
   res: Response
 ): Promise<any> => {
   try {
-    const { week, day, type } = req.query;
+    const { upper: upperBound, lower: lowerBound } = req.query;
+    const numberOfRestaurants = req.params.number;
+
     let results: QueryResult;
-    if (type === undefined || type === 'more') {
-      if (week === undefined && day === undefined) {
-        return res.status(400).send('Please specify week or day in the query');
-      } else if (week === undefined) {
-        results = await pool.query(
-          `SELECT DISTINCT R.name AS restaurant_name
-            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
-            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) >= $1`, [day]);
-      } else {
-        results = await pool.query(
-          `SELECT foo.restaurant_name
-            FROM (SELECT R.name AS restaurant_name, SUM(EXTRACT(hours FROM (O.end_time - O.start_time))) AS hours
-            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
-            GROUP BY R.id) foo
-            WHERE foo.hours >= $1`, [week]);
-      }
+    if (upperBound === undefined && lowerBound === undefined) {
+      results = await pool.query(
+        `SELECT R.id, R.name, foo.transaction_amount
+          FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $1`,
+        [numberOfRestaurants]
+      );
+    } else if (upperBound === undefined) {
+      results = await pool.query(
+        `SELECT R.id, R.name, foo.transaction_amount
+          FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
+          WHERE T.date <= $1
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $1`,
+        [upperBound, numberOfRestaurants]
+      );
+    } else if (lowerBound === undefined)
+    {
+      results = await pool.query(
+        `SELECT R.id, R.name, foo.transaction_amount
+          FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
+          WHERE T.date >= $1
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $1`,
+        [lowerBound, numberOfRestaurants]
+      );
     } else {
-      if (week === undefined && day === undefined) {
-        return res.status(400).send('Please specify week or day in the query');
-      } else if (week === undefined) {
-        results = await pool.query(
-          `SELECT DISTINCT R.name AS restaurant_name
-            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
-            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) <= $1`, [day]);
-      } else {
-        results = await pool.query(
-          `SELECT foo.restaurant_name
-            FROM (SELECT R.name AS restaurant_name, SUM(EXTRACT(hours FROM (O.end_time - O.start_time))) AS hours
-            FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
-            GROUP BY R.id) foo
-            WHERE foo.hours <= $1`, [week]);
-      }
+      results = await pool.query(
+        `SELECT R.id, R.name, foo.transaction_amount
+          FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
+          WHERE T.date >= $1 and T.date <= $2
+          ORDER BY DESC foo.transaction_amount
+          LIMIT $1`,
+        [lowerBound, upperBound, numberOfRestaurants]
+      );
     }
 
     if (results.rowCount === 0) {
