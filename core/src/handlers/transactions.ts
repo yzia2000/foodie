@@ -24,29 +24,33 @@ export const listUsersByAmount = async (
   res: Response
 ): Promise<void> => {
   try {
-    let { date: dateString, time: timeString } = req.query;
-    if (dateString === undefined) {
-      res.status(402).send('Specify date query');
-    } 
+    const { upper: upperBound, lower: lowerBound, type } = req.query;
+    const dollars = req.params.dollars;
+
+    if (upperBound === undefined || lowerBound === undefined) {
+      res.status(400).send('Please specify date upperBound and lowerBound in query');
+    }
 
     let results: QueryResult;
-    if (timeString === undefined) {
-      let date: Date = new Date(dateString + "");
+
+    if (type === undefined || type === 'more') {
       results = await pool.query(
-        `SELECT DISTINCT R.name, O.start_time, O.end_time
-          FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id 
-          WHERE O.weekday = $1`,
-        [date.getUTCDay()]
+        `SELECT COUNT(DINSTINCT T.user_id)
+          FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+          WHERE I.price >= $1 and T.date >= $2 and T.date <= $3
+          GROUP BY T.user_id`,
+        [dollars, lowerBound, upperBound]
       );
     } else {
-      let date: Date = new Date(dateString + "");
       results = await pool.query(
-        `SELECT DISTINCT R.name, O.start_time, O.end_time
-          FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id 
-          WHERE O.weekday = $1 and O.end_time >= $2 and O.start_time <= $2`,
-        [date.getUTCDay(), timeString]
+        `SELECT COUNT(DINSTINCT T.user_id)
+          FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+          WHERE I.price <= $1 and T.date >= $2 and T.date <= $3
+          GROUP BY T.user_id`,
+        [dollars, lowerBound, upperBound]
       );
     }
+
     if (results.rowCount === 0) {
       res.status(400).send('No restaurants found');
     } else {
@@ -81,10 +85,10 @@ export const listTopRestaurantsByTransaction = async (
         `SELECT R.id, R.name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            WHERE T.date <= $1
             GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          WHERE T.date <= $1
           ORDER BY DESC foo.transaction_amount
-          LIMIT $1`,
+          LIMIT $2`,
         [upperBound, numberOfRestaurants]
       );
     } else if (lowerBound === undefined)
@@ -93,10 +97,10 @@ export const listTopRestaurantsByTransaction = async (
         `SELECT R.id, R.name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            WHERE T.date >= $1
             GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          WHERE T.date >= $1
           ORDER BY DESC foo.transaction_amount
-          LIMIT $1`,
+          LIMIT $2`,
         [lowerBound, numberOfRestaurants]
       );
     } else {
@@ -104,10 +108,10 @@ export const listTopRestaurantsByTransaction = async (
         `SELECT R.id, R.name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            WHERE T.date >= $1 and T.date <= $2
             GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          WHERE T.date >= $1 and T.date <= $2
           ORDER BY DESC foo.transaction_amount
-          LIMIT $1`,
+          LIMIT $3`,
         [lowerBound, upperBound, numberOfRestaurants]
       );
     }
