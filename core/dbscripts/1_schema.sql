@@ -1,8 +1,9 @@
+CREATE EXTENSION pg_trgm;
 BEGIN;
 CREATE TABLE Restaurants(
   id SERIAL PRIMARY KEY,
   name varchar(255) NOT NULL,
-  cash_balance int NOT NULL
+  cash_balance float NOT NULL
 );
 
 CREATE TABLE Opening_Hours(
@@ -17,7 +18,7 @@ CREATE TABLE Items(
   id SERIAL PRIMARY KEY,
   restaurant_id int references Restaurants(id) NOT NULL,
   name varchar(255) NOT NULL,
-  price int NOT NULL,
+  price float NOT NULL,
   unique(restaurant_id, name)
 );
 COMMIT;

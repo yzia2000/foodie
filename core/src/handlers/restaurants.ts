@@ -179,30 +179,39 @@ export const listRestaurantsByDishPriceRange = async (
 
 export const listByName = async (req: Request, res: Response): Promise<any> => {
   try {
-    const restaurantName = req.query.restaurant; // restaurant or dish
-    const dishName = req.query.dish; // restaurant or dish
+    const restaurantName = req.query.restaurant; // restaurant or item
+    const itemName = req.query.item; // restaurant or item
 
     let results: QueryResult;
-    if (restaurantName === undefined && dishName === undefined) {
-      return res.send(
-        'Welcome to foodie restaurants! Please specify dish or restaurant in the query'
-      );
+    if (restaurantName === undefined && itemName === undefined) {
+      results = await pool.query('SELECT DISTINCT name FROM Restaurants');
     } else if (restaurantName === undefined) {
+      console.log(itemName);
       results = await pool.query(
-        'SELECT DISTINCT name FROM Items WHERE name ilike $1',
-        [dishName]
+        `SELECT foo.name AS item_name FROM 
+          (SELECT distinct name 
+          FROM Items) foo
+          WHERE (foo.name <-> $1) < 0.95 
+          ORDER BY (foo.name <-> $1)`,
+        [itemName]
       );
-    } else if (dishName === undefined) {
+    } else if (itemName === undefined) {
+      console.log(restaurantName);
       results = await pool.query(
-        'SELECT DISTINCT name FROM Restaurants WHERE name ilike $1',
+        `SELECT foo.name AS restaurant_name FROM 
+          (SELECT distinct name 
+          FROM Restaurants) foo
+          WHERE (foo.name <-> $1) < 0.95 
+          ORDER BY (foo.name <-> $1)`,
         [restaurantName]
       );
     } else {
       results = await pool.query(
-        `SELECT DISTINCT R.name, I.name 
-          FROM Restaurants R NATURAL JOIN Items I 
-          WHERE R.name ilike $1 and I.name ilike $2`,
-        [restaurantName, dishName]
+        `SELECT R.name AS restaurant_name, I.name AS item_name
+          FROM Restaurants R INNER JOIN Items I ON R.id = I.restaurant_id
+          WHERE (R.name <-> $1) < 0.95 and (I.name <-> $2) < 0.95 
+          ORDER BY (R.name <-> $1), (I.name <-> $2)`,
+        [restaurantName, itemName]
       );
     }
 
