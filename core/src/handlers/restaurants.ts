@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../db';
+import { Restaurants } from '../types';
 
 export const addOpeningHour = async (
   req: Request,
@@ -17,10 +18,10 @@ export const createRestaurant = async (
   res: Response
 ): Promise<void> => {
   try {
-    const name: string = req.body.name;
-    const results = await pool.query(
-      'SELECT DISTINCT name FROM Items WHERE name ilike $1',
-      [name]
+    const restaurant: Restaurants = req.body;
+    await pool.query(
+      'INSERT INTO Restaurants(name, cash_balance) VALUES($1, $2)',
+      [restaurant.name, restaurant.cashBalance]
     );
   } catch (error) {
     res.status(403).send('Something went wrong');
@@ -42,6 +43,16 @@ export const listRestaurantsByDate = async (
   res: Response
 ): Promise<void> => {
   try {
+    const date: Date = new Date(req.params.date);
+    const results = await pool.query(
+      'SELECT DISTINCT R.name FROM Restaurants R NATURAL JOIN Opening_Hours O WHERE O.weekday = $1 and O.end_time >= $2 and O.start_time <= $2',
+      [date.getUTCDay(), date]
+    );
+    if (results.rowCount == 0) {
+      res.status(400).send('No restaurants found');
+    } else {
+      res.status(200).json(results.rows);
+    }
   } catch (error) {
     res.status(403).send('Something went wrong');
   }

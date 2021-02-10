@@ -7,7 +7,9 @@ CREATE TABLE Restaurants(
 
 CREATE TABLE Opening_Hours(
   restaurant_id int references Restaurants(id),
-  weekday varchar(5) check(weekday in ('Mon', 'Tues', 'Weds', 'Thurs', 'Fri', 'Sat', 'Sun')),
+  weekday int check(weekday <= 6 and weekday >= 0),
+  start_time time NOT NULL,
+  end_time time NOT NULL,
   PRIMARY KEY(restaurant_id, weekday)
 );
 
