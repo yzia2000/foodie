@@ -230,7 +230,7 @@ export const listByName = async (req: Request, res: Response): Promise<any> => {
     } else if (restaurantName === undefined) {
       results = await pool.query(
         `SELECT foo.name AS dish_name FROM 
-          (SELECT distinct name 
+          (SELECT distinct name
           FROM Items) foo
           WHERE (foo.name <-> $1) < 0.95 
           ORDER BY (foo.name <-> $1)`,

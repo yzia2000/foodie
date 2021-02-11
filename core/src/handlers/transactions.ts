@@ -21,7 +21,7 @@ export const createTransaction = async (
     const itemPrice = itemPriceQuery.rows[0].price;
 
     const userUpdateQuery: QueryResult = await client.query(
-      'UPDATE Users SET cash_balance = cash_balance - $1 WHERE id = $2 RETURN *',
+      'UPDATE Users SET cash_balance = cash_balance - $1 WHERE id = $2 RETURNING *',
       [itemPrice, userId]
     );
 
@@ -34,9 +34,10 @@ export const createTransaction = async (
       [userId, itemId, date]
     );
     await client.query('COMMIT');
+    res.status(200).send('Purchase successful');
   } catch (error) {
     await client.query('ROLLBACK');
-    res.status(403).send(error.Message);
+    res.status(403).send(error.message);
   } finally {
     client.release();
   }
