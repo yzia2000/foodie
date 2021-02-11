@@ -6,7 +6,7 @@ import {
   listRestaurantsByDate,
   listRestaurantsByAvailability,
   listRestaurantsByDishPriceRange,
-  listByName
+  listByName,
 } from '../handlers/restaurants';
 
 const restaurants: Router = express.Router();

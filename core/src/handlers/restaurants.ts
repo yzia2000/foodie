@@ -12,10 +12,10 @@ export const addOpeningHour = async (
     await pool.query(
       'INSERT INTO Opening_Hours(restaurant_id, weekday, start_time, end_time) VALUES($1, $2, $3)',
       [
-        opening.restaurant_id,
+        opening.restaurantId,
         opening.weekday,
-        opening.start_time,
-        opening.end_time
+        opening.startTime,
+        opening.endTime,
       ]
     );
     res.status(200).send('Opening hour added to restaurant');
@@ -48,7 +48,7 @@ export const addDishToMenu = async (
     const item: Item = req.body;
     await pool.query(
       'INSERT INTO Items(restaurant_id, name, price) VALUES($1, $2, $3)',
-      [item.restaurant_id, item.name, item.price]
+      [item.restaurantId, item.name, item.price]
     );
     res.status(200).send('Added item');
   } catch (error) {
@@ -62,8 +62,8 @@ export const listRestaurantsByDate = async (
 ): Promise<void> => {
   try {
     const { date: dateString, time: timeString } = req.query as {
-      date: string
-      time: string | undefined
+      date: string;
+      time: string | undefined;
     };
 
     if (dateString === undefined) {
@@ -100,7 +100,7 @@ export const listRestaurantsByDate = async (
 export const listRestaurantsByAvailability = async (
   req: Request,
   res: Response
-): Promise<any> => {
+): Promise<Response | undefined> => {
   try {
     const { week, day, type } = req.query;
     let results: QueryResult;
@@ -220,7 +220,7 @@ export const listRestaurantsByDishPriceRange = async (
   }
 };
 
-export const listByName = async (req: Request, res: Response): Promise<any> => {
+export const listByName = async (req: Request, res: Response): Promise<Response | undefined> => {
   try {
     const { restaurant: restaurantName, dish: dishName } = req.query;
 

@@ -3,7 +3,7 @@ import {
   listTopUsersByTransaction,
   listTopRestaurantsByTransaction,
   listUsersByAmount,
-  createTransaction
+  createTransaction,
 } from '../handlers/transactions';
 
 const restaurants: Router = express.Router();

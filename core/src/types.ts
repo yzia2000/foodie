@@ -6,7 +6,7 @@ export interface Restaurant {
 
 export interface Item {
   id?: number
-  restaurant_id: number
+  restaurantId: number
   name: string
   cashBalance: number
   price: number
@@ -14,7 +14,7 @@ export interface Item {
 
 export interface OpeningHour {
   weekday: string
-  restaurant_id: number
-  start_time: string
-  end_time: string
+  restaurantId: number
+  startTime: string
+  endTime: string
 }

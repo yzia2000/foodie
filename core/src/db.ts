@@ -5,5 +5,5 @@ const connectionString: string =
   'postgresql://postgres:postgres@userdb:5432/database';
 
 export default new Pool({
-  connectionString: connectionString
+  connectionString: connectionString,
 });

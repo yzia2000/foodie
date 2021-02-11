@@ -1,9 +1,5 @@
 {
-  "extends": ["standard-with-typescript"],
-  "rules": {
-    "@typescript-eslint/semi": [1, "always"],
-    "@typescript-eslint/no-misused-promises": 0
-  },
+  "extends": ["@glints/eslint-config"],
   "parserOptions": {
     "project": "./tsconfig.json"
   }

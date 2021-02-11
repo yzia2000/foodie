@@ -90,7 +90,7 @@ export const listUsersByAmount = async (
 export const listTopRestaurantsByTransaction = async (
   req: Request,
   res: Response
-): Promise<any> => {
+): Promise<void> => {
   try {
     const { upper: upperBound, lower: lowerBound } = req.query;
     const numberOfRestaurants = req.params.number;
@@ -142,9 +142,9 @@ export const listTopRestaurantsByTransaction = async (
     }
 
     if (results.rowCount === 0) {
-      return res.status(400).send('No results found');
+      res.status(400).send('No results found');
     } else {
-      return res.json(results.rows);
+      res.json(results.rows);
     }
   } catch (error) {
     res.status(403).send('Something went wrong');
