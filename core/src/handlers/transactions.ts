@@ -165,29 +165,29 @@ export const listTopUsersByTransaction = async (
           FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
             GROUP BY T.user_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+          ORDER BY foo.transaction_amount DESC
           LIMIT $1`,
         [numberOfUsers]
-      );
-    } else if (upperBound === undefined) {
-      results = await pool.query(
-        `SELECT U.id, U.name, foo.transaction_amount
-          FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
-            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
-            WHERE T.date <= $1
-            GROUP BY T.user_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
-          LIMIT $2`,
-        [upperBound, numberOfUsers]
       );
     } else if (lowerBound === undefined) {
       results = await pool.query(
         `SELECT U.id, U.name, foo.transaction_amount
           FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
+            WHERE T.date <= $1
+            GROUP BY T.user_id) foo ON U.id = foo.user_id 
+          ORDER BY foo.transaction_amount DESC
+          LIMIT $2`,
+        [upperBound, numberOfUsers]
+      );
+    } else if (upperBound === undefined) {
+      results = await pool.query(
+        `SELECT U.id, U.name, foo.transaction_amount
+          FROM Users U INNER JOIN (SELECT T.user_id, SUM(I.price) AS transaction_amount
+            FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
             WHERE T.date >= $1
             GROUP BY T.user_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+          ORDER BY foo.transaction_amount DESC
           LIMIT $2`,
         [lowerBound, numberOfUsers]
       );
@@ -198,7 +198,7 @@ export const listTopUsersByTransaction = async (
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
             WHERE T.date >= $1 and T.date <= $2
             GROUP BY T.user_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+          ORDER BY foo.transaction_amount DESC
           LIMIT $3`,
         [lowerBound, upperBound, numberOfUsers]
       );

@@ -3,6 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import RestaurantsRoute from './routes/restaurants';
+import TransactionRoute from './routes/transactions';
 
 const app: Application = express();
 
@@ -12,5 +13,6 @@ app.use(bodyParser.json());
 app.use(helmet());
 
 app.use('/restaurants', RestaurantsRoute);
+app.use('/transactions', TransactionRoute);
 
 export default app;

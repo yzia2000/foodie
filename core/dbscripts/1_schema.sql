@@ -24,7 +24,7 @@ CREATE TABLE Items(
 
 CREATE TABLE Users(
   id SERIAL PRIMARY KEY,
-  cashBalance float NOT NULL,
+  cash_balance float NOT NULL,
   name varchar(255)
 );
 
