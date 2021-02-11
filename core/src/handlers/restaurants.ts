@@ -11,7 +11,12 @@ export const addOpeningHour = async (
     const opening: OpeningHour = req.body;
     await pool.query(
       'INSERT INTO Opening_Hours(restaurant_id, weekday, start_time, end_time) VALUES($1, $2, $3)',
-      [opening.restaurant_id, opening.weekday, opening.start_time, opening.end_time]
+      [
+        opening.restaurant_id,
+        opening.weekday,
+        opening.start_time,
+        opening.end_time
+      ]
     );
     res.status(200).send('Opening hour added to restaurant');
   } catch (error) {
@@ -56,14 +61,18 @@ export const listRestaurantsByDate = async (
   res: Response
 ): Promise<void> => {
   try {
-    let { date: dateString, time: timeString } = req.query;
+    const { date: dateString, time: timeString } = req.query as {
+      date: string
+      time: string | undefined
+    };
+
     if (dateString === undefined) {
       res.status(402).send('Specify date query');
-    } 
+    }
 
     let results: QueryResult;
+    const date: Date = new Date(dateString);
     if (timeString === undefined) {
-      let date: Date = new Date(dateString + "");
       results = await pool.query(
         `SELECT DISTINCT R.name, O.start_time, O.end_time
           FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id 
@@ -71,7 +80,6 @@ export const listRestaurantsByDate = async (
         [date.getUTCDay()]
       );
     } else {
-      let date: Date = new Date(dateString + "");
       results = await pool.query(
         `SELECT DISTINCT R.name, O.start_time, O.end_time
           FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id 
@@ -103,14 +111,18 @@ export const listRestaurantsByAvailability = async (
         results = await pool.query(
           `SELECT DISTINCT R.name AS restaurant_name
             FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
-            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) >= $1`, [day]);
+            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) >= $1`,
+          [day]
+        );
       } else {
         results = await pool.query(
           `SELECT foo.restaurant_name
             FROM (SELECT R.name AS restaurant_name, SUM(EXTRACT(hours FROM (O.end_time - O.start_time))) AS hours
             FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
             GROUP BY R.id) foo
-            WHERE foo.hours >= $1`, [week]);
+            WHERE foo.hours >= $1`,
+          [week]
+        );
       }
     } else {
       if (week === undefined && day === undefined) {
@@ -119,14 +131,18 @@ export const listRestaurantsByAvailability = async (
         results = await pool.query(
           `SELECT DISTINCT R.name AS restaurant_name
             FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
-            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) <= $1`, [day]);
+            WHERE EXTRACT(hours FROM (O.end_time - O.start_time)) <= $1`,
+          [day]
+        );
       } else {
         results = await pool.query(
           `SELECT foo.restaurant_name
             FROM (SELECT R.name AS restaurant_name, SUM(EXTRACT(hours FROM (O.end_time - O.start_time))) AS hours
             FROM Restaurants R INNER JOIN Opening_Hours O ON R.id = O.restaurant_id
             GROUP BY R.id) foo
-            WHERE foo.hours <= $1`, [week]);
+            WHERE foo.hours <= $1`,
+          [week]
+        );
       }
     }
 
@@ -171,8 +187,7 @@ export const listRestaurantsByDishPriceRange = async (
             HAVING COUNT(restaurant_id) >= $2)`,
         [lowerBound, numberOfDishes]
       );
-    } else if (lowerBound === undefined)
-    {
+    } else if (lowerBound === undefined) {
       results = await pool.query(
         `SELECT name FROM Restaurants 
           WHERE id IN 
