@@ -60,24 +60,24 @@ export const listUsersByAmount = async (
 
     if (type === undefined || type === 'more') {
       results = await pool.query(
-        `SELECT COUNT(DINSTINCT T.user_id)
+        `SELECT COUNT(DISTINCT T.user_id) AS total
           FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
           WHERE I.price >= $1 and T.date >= $2 and T.date <= $3
-          GROUP BY T.user_id`,
+          `,
         [dollars, lowerBound, upperBound]
       );
     } else {
       results = await pool.query(
-        `SELECT COUNT(DINSTINCT T.user_id)
+        `SELECT COUNT(DISTINCT T.user_id) AS total
           FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
           WHERE I.price <= $1 and T.date >= $2 and T.date <= $3
-          GROUP BY T.user_id`,
+          `,
         [dollars, lowerBound, upperBound]
       );
     }
 
     if (results.rowCount === 0) {
-      res.status(400).send('No restaurants found');
+      res.status(400).send('No users found');
     } else {
       res.status(200).json(results.rows);
     }
@@ -205,7 +205,7 @@ export const listTopUsersByTransaction = async (
     }
 
     if (results.rowCount === 0) {
-      res.status(400).send('No results found');
+      res.status(400).send('No users found');
     } else {
       res.json(results.rows);
     }
