@@ -19,17 +19,15 @@
 - Staging Server
 - Production Server
 
-<b>Testing in prod is strictly forbidden</b>
-
 ## Technology stack
-- ReactJS - Frontend
 - Node Express - Rest API
 - Postgres - Database
-- Jest - Testing
-- Selenium - GUI Testing Automation (E2E testing)
+- Jest - Testing and coverage
+- Supertest - Endpoint testing
+- Frontend - Swagger
 
 ## Deployment
-- Netlify - Static frontend deployment (Migrate to heroku for Server Side Rendering when migrating to NextJS)
+- Netlify - Swagger
 - Heroku - Postgres and Node Express REST API deployment
 
 ## Contributing
