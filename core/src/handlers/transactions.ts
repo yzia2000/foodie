@@ -97,44 +97,44 @@ export const listTopRestaurantsByTransaction = async (
     let results: QueryResult;
     if (upperBound === undefined && lowerBound === undefined) {
       results = await pool.query(
-        `SELECT R.id, R.name, foo.transaction_amount
+        `SELECT R.id AS restaurant_id, R.name AS restaurant_name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
-            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+            GROUP BY I.restaurant_id) foo ON R.id = foo.restaurant_id 
+          ORDER BY foo.transaction_amount DESC
           LIMIT $1`,
         [numberOfRestaurants]
       );
-    } else if (upperBound === undefined) {
+    } else if (lowerBound === undefined) {
       results = await pool.query(
-        `SELECT R.id, R.name, foo.transaction_amount
+        `SELECT R.id AS restaurant_id, R.name AS restaurant_name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
             WHERE T.date <= $1
-            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+            GROUP BY I.restaurant_id) foo ON R.id = foo.restaurant_id           
+          ORDER BY foo.transaction_amount DESC
           LIMIT $2`,
         [upperBound, numberOfRestaurants]
       );
-    } else if (lowerBound === undefined) {
+    } else if (upperBound === undefined) {
       results = await pool.query(
-        `SELECT R.id, R.name, foo.transaction_amount
+        `SELECT R.id AS restaurant_id, R.name AS restaurant_name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
             WHERE T.date >= $1
-            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+            GROUP BY I.restaurant_id) foo ON R.id = foo.restaurant_id           
+          ORDER BY foo.transaction_amount DESC
           LIMIT $2`,
         [lowerBound, numberOfRestaurants]
       );
     } else {
       results = await pool.query(
-        `SELECT R.id, R.name, foo.transaction_amount
+        `SELECT R.id AS restaurant_id, R.name AS restaurant_name, foo.transaction_amount
           FROM Restaurants R INNER JOIN (SELECT I.restaurant_id, SUM(I.price) AS transaction_amount
             FROM Transactions T INNER JOIN Items I ON I.id = T.item_id
             WHERE T.date >= $1 and T.date <= $2
-            GROUP BY I.restaurant_id) foo ON U.id = foo.user_id 
-          ORDER BY DESC foo.transaction_amount
+            GROUP BY I.restaurant_id) foo ON R.id = foo.restaurant_id           
+          ORDER BY foo.transaction_amount DESC
           LIMIT $3`,
         [lowerBound, upperBound, numberOfRestaurants]
       );
