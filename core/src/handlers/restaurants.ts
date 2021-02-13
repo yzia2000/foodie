@@ -1,12 +1,9 @@
-import { Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../db';
 import { Item, OpeningHour, Restaurant } from '../types';
 
-export const addOpeningHour = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const addOpeningHour: RequestHandler = async (req, res) => {
   try {
     const opening: OpeningHour = req.body;
     await pool.query(
@@ -24,10 +21,7 @@ export const addOpeningHour = async (
   }
 };
 
-export const createRestaurant = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createRestaurant: RequestHandler = async (req, res) => {
   try {
     const restaurant: Restaurant = req.body;
     const results = await pool.query(
@@ -40,10 +34,7 @@ export const createRestaurant = async (
   }
 };
 
-export const addDishToMenu = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const addDishToMenu: RequestHandler = async (req, res) => {
   try {
     const item: Item = req.body;
     await pool.query(
@@ -56,10 +47,7 @@ export const addDishToMenu = async (
   }
 };
 
-export const listRestaurantsByDate = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const listRestaurantsByDate: RequestHandler = async (req, res) => {
   try {
     const { date: dateString, time: timeString } = req.query as {
       date: string;
@@ -97,10 +85,10 @@ export const listRestaurantsByDate = async (
   }
 };
 
-export const listRestaurantsByAvailability = async (
-  req: Request,
-  res: Response
-): Promise<Response | undefined> => {
+export const listRestaurantsByAvailability: RequestHandler = async (
+  req,
+  res
+) => {
   try {
     const { week, day, type } = req.query;
     let results: QueryResult;
@@ -156,10 +144,10 @@ export const listRestaurantsByAvailability = async (
   }
 };
 
-export const listRestaurantsByDishPriceRange = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const listRestaurantsByDishPriceRange: RequestHandler = async (
+  req,
+  res
+) => {
   try {
     const { upper: upperBound, lower: lowerBound } = req.query;
     const numberOfDishes: string = req.params.number;
@@ -220,7 +208,7 @@ export const listRestaurantsByDishPriceRange = async (
   }
 };
 
-export const listByName = async (req: Request, res: Response): Promise<Response | undefined> => {
+export const listByName: RequestHandler = async (req, res) => {
   try {
     const { restaurant: restaurantName, dish: dishName } = req.query;
 

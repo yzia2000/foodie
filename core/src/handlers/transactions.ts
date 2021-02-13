@@ -1,11 +1,8 @@
-import { Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import { QueryResult } from 'pg';
 import pool from '../db';
 
-export const createTransaction = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const createTransaction: RequestHandler = async (req, res) => {
   const client = await pool.connect();
   try {
     const { itemId, userId, date = new Date().toLocaleDateString() } = req.body;
@@ -43,10 +40,7 @@ export const createTransaction = async (
   }
 };
 
-export const listUsersByAmount = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const listUsersByAmount: RequestHandler = async (req, res) => {
   try {
     const { upper: upperBound, lower: lowerBound, type } = req.query;
     const dollars = req.params.dollars;
@@ -87,10 +81,10 @@ export const listUsersByAmount = async (
   }
 };
 
-export const listTopRestaurantsByTransaction = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const listTopRestaurantsByTransaction: RequestHandler = async (
+  req,
+  res
+) => {
   try {
     const { upper: upperBound, lower: lowerBound } = req.query;
     const numberOfRestaurants = req.params.number;
@@ -151,10 +145,7 @@ export const listTopRestaurantsByTransaction = async (
   }
 };
 
-export const listTopUsersByTransaction = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const listTopUsersByTransaction: RequestHandler = async (req, res) => {
   try {
     const { upper: upperBound, lower: lowerBound } = req.query;
     const numberOfUsers = req.params.number;
