@@ -15,6 +15,6 @@ app.use(helmet());
 
 app.use('/restaurants', RestaurantsRoute);
 app.use('/transactions', TransactionRoute);
-app.use('/api-docs', SwaggerRoute);
+app.use(SwaggerRoute);
 
 export default app;
