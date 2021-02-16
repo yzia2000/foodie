@@ -253,7 +253,6 @@ export const listByName: RequestHandler = async (req, res) => {
       return res.json(results.rows);
     }
   } catch (error) {
-    console.error(error);
     res.status(400).send('Invalid request');
   }
 };
