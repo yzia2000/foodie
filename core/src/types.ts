@@ -18,3 +18,9 @@ export interface OpeningHour {
   startTime: string
   endTime: string
 }
+
+export interface User {
+  id?: number
+  name: string
+  cashBalance: number
+}

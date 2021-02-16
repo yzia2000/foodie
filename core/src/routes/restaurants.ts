@@ -16,6 +16,8 @@ const restaurants: Router = express.Router();
  * /restaurants:
  *   get:
  *     description: List all restaurants or dishes by name
+ *     tags:
+ *       - restaurants
  *     parameters:
  *       - name: restaurant
  *         in: query
@@ -42,6 +44,8 @@ restaurants.get('/', listByName);
  * /restaurants/open:
  *   get:
  *     description: List all restaurants open by datetime
+ *     tags:
+ *       - restaurants
  *     parameters:
  *       - name: date
  *         in: query
@@ -68,6 +72,8 @@ restaurants.get('/open', listRestaurantsByDate);
  * /restaurants/hours:
  *   get:
  *     description: List restaurants by hour availability
+ *     tags:
+ *       - restaurants
  *     parameters:
  *       - name: week
  *         in: query
@@ -99,6 +105,8 @@ restaurants.get('/hours', listRestaurantsByAvailability);
  * /restaurants/dishes/{number}:
  *   get:
  *     description: List restaurants by hour availability
+ *     tags:
+ *       - restaurants
  *     parameters:
  *       - name: number
  *         in: path
@@ -130,6 +138,8 @@ restaurants.get('/dishes/:number', listRestaurantsByDishPriceRange);
  * /restaurants:
  *   post:
  *     description: Create restaurant
+ *     tags:
+ *       - restaurants
  *     requestBody:
  *       content:
  *         application/json:
@@ -155,6 +165,8 @@ restaurants.post('/', createRestaurant);
  * /restaurants/menu:
  *   post:
  *     description: Add a dish to restaurants menu
+ *     tags:
+ *       - restaurants
  *     requestBody:
  *       content:
  *         application/json:
@@ -182,6 +194,8 @@ restaurants.post('/menu', addDishToMenu);
  * /restaurants/hours:
  *   post:
  *     description: Add an opening hour to a restaurant
+ *     tags:
+ *       - restaurants
  *     requestBody:
  *       content:
  *         application/json:

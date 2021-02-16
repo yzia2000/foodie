@@ -14,6 +14,8 @@ const restaurants: Router = express.Router();
  * /transactions:
  *   get:
  *     description: List all transactions
+ *     tags:
+ *       - transactions
  *     responses:
  *       200:
  *         description: Returns json object with transactions
@@ -29,6 +31,8 @@ restaurants.get('/', getAllTransactions);
  * /transactions/users/{number}:
  *   get:
  *     description: List all top users with total transactions in a date range
+ *     tags:
+ *       - transactions
  *     parameters:
  *       - name: number
  *         in: path
@@ -60,6 +64,8 @@ restaurants.get('/users/:number', listTopUsersByTransaction);
  * /transactions/restaurants/{number}:
  *   get:
  *     description: List all top restaurants with total transactions in a date range
+ *     tags:
+ *       - transactions
  *     parameters:
  *       - name: number
  *         in: path
@@ -91,6 +97,8 @@ restaurants.get('/restaurants/:number', listTopRestaurantsByTransaction);
  * /transactions/users/dollars/{dollars}:
  *   get:
  *     description: List number of users with single transaction amount more or less in a date range
+ *     tags:
+ *       - transactions
  *     parameters:
  *       - name: dollars
  *         in: path
@@ -127,6 +135,8 @@ restaurants.get('/users/dollars/:dollars', listUsersByAmount);
  * /transactions:
  *   post:
  *     description: Commit a transaction
+ *     tags:
+ *       - transactions
  *     requestBody:
  *       content:
  *         application/json:

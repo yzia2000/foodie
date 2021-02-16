@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import RestaurantsRoute from './routes/restaurants';
 import TransactionRoute from './routes/transactions';
 import SwaggerRoute from './routes/swagger';
+import UsersRoute from './routes/users';
 
 const app: Application = express();
 
@@ -15,6 +16,7 @@ app.use(helmet());
 
 app.use('/restaurants', RestaurantsRoute);
 app.use('/transactions', TransactionRoute);
+app.use('/users', UsersRoute);
 app.use(SwaggerRoute);
 
 export default app;
