@@ -13,7 +13,7 @@ const options = {
       version: '1.0.0',
     },
   },
-  apis: ['./src/routes/*'], // files containing annotations as above
+  apis: ['./src/routes/*', './dist/routes/*'], // files containing annotations as above
   url: 'http://localhost:5000',
 };
 
