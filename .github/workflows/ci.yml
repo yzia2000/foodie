@@ -26,3 +26,20 @@ jobs:
         run: |
             cd core
             docker-compose -f docker-compose.test.yml up --build --exit-code-from sut sut
+
+  deploy_heroku:
+    runs-on: ubuntu-latest
+    needs: [lint_core, test_core]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.11.10 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "foodie-for-glints" #Must be unique in Heroku
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          usedocker: true
+          appdir: core
+          docker_build_args: |
+            DATABASE_URL
+          env:
+            DATABASE_URL=${{secrets.DATABASE_URL}}
