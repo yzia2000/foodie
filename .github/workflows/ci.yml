@@ -40,6 +40,8 @@ jobs:
           usedocker: true
           appdir: core
           docker_build_args: |
+            NODE_ENV
             DATABASE_URL
         env:
+          NODE_ENV: production
           DATABASE_URL: ${{secrets.DATABASE_URL}}
