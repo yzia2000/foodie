@@ -34,7 +34,7 @@ export const createTransaction: RequestHandler = async (req, res) => {
     res.status(200).send('Purchase successful');
   } catch (error) {
     await client.query('ROLLBACK');
-    res.status(403).send(error.message);
+    res.status(400).send(error.message);
   } finally {
     client.release();
   }
@@ -72,12 +72,12 @@ export const listUsersByAmount: RequestHandler = async (req, res) => {
     }
 
     if (results.rowCount === 0) {
-      res.status(400).send('No users found');
+      res.status(404).send('No users found');
     } else {
       res.status(200).json(results.rows);
     }
   } catch (error) {
-    res.status(403).send('Something went wrong');
+    res.status(400).send('Invalid request');
   }
 };
 
@@ -136,12 +136,12 @@ export const listTopRestaurantsByTransaction: RequestHandler = async (
     }
 
     if (results.rowCount === 0) {
-      res.status(400).send('No results found');
+      res.status(404).send('No results found');
     } else {
       res.json(results.rows);
     }
   } catch (error) {
-    res.status(403).send('Something went wrong');
+    res.status(400).send('Invalid request');
   }
 };
 
@@ -197,12 +197,12 @@ export const listTopUsersByTransaction: RequestHandler = async (req, res) => {
     }
 
     if (results.rowCount === 0) {
-      res.status(400).send('No users found');
+      res.status(404).send('No users found');
     } else {
       res.json(results.rows);
     }
   } catch (error) {
-    res.status(403).send('Something went wrong');
+    res.status(400).send('Invalid request');
   }
 };
 
@@ -215,11 +215,11 @@ export const getAllTransactions: RequestHandler = async (_req, res) => {
     );
 
     if (results.rowCount === 0) {
-      res.status(400).send('No users found');
+      res.status(404).send('No users found');
     } else {
       res.json(results.rows);
     }
   } catch (error) {
-    res.status(403).send('Something went wrong');
+    res.status(400).send('Invalid request');
   }
 };
