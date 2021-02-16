@@ -205,3 +205,21 @@ export const listTopUsersByTransaction: RequestHandler = async (req, res) => {
     res.status(403).send('Something went wrong');
   }
 };
+
+
+export const getAllTransactions: RequestHandler = async (_req, res) => {
+  try {
+    let results: QueryResult;
+    results = await pool.query(
+      `SELECT * FROM Transactions`
+    );
+
+    if (results.rowCount === 0) {
+      res.status(400).send('No users found');
+    } else {
+      res.json(results.rows);
+    }
+  } catch (error) {
+    res.status(403).send('Something went wrong');
+  }
+};
