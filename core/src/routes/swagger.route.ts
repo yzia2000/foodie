@@ -9,11 +9,12 @@ const options = {
     openapi: '3.0.0',
     info: {
       title: 'Foodie Docs',
-      description: 'Minimal API that handles restaurant and user transactions and analytics',
+      description:
+        'Minimal API that handles restaurant and user transactions and analytics',
       version: '1.0.0',
     },
   },
-  apis: ['./src/routes/*.route*', './dist/routes/*.route*']
+  apis: ['./src/routes/*.route*', './dist/routes/*.route*'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

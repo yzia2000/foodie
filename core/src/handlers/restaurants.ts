@@ -218,7 +218,9 @@ export const listByName: RequestHandler = async (req, res) => {
 
     let results: QueryResult;
     if (restaurantName === undefined && dishName === undefined) {
-      results = await pool.query('SELECT id AS restaurant_id, name AS restaurant_name FROM Restaurants');
+      results = await pool.query(
+        'SELECT id AS restaurant_id, name AS restaurant_name FROM Restaurants'
+      );
     } else if (restaurantName === undefined) {
       results = await pool.query(
         `SELECT foo.id AS dish_id, foo.name AS dish_name FROM 

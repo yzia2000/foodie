@@ -9,7 +9,7 @@ export const createTransaction: RequestHandler = async (req, res) => {
 
     await client.query('BEGIN');
 
-    const weekday: number = (new Date(date)).getUTCDay();
+    const weekday: number = new Date(date).getUTCDay();
 
     const openHours: QueryResult = await client.query(
       `SELECT I.id 
@@ -220,13 +220,9 @@ export const listTopUsersByTransaction: RequestHandler = async (req, res) => {
   }
 };
 
-
 export const getAllTransactions: RequestHandler = async (_req, res) => {
   try {
-    let results: QueryResult;
-    results = await pool.query(
-      `SELECT * FROM Transactions`
-    );
+    const results = await pool.query('SELECT * FROM Transactions');
 
     if (results.rowCount === 0) {
       res.status(404).send('No users found');

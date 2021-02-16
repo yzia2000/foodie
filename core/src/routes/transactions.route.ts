@@ -4,7 +4,7 @@ import {
   listTopRestaurantsByTransaction,
   listUsersByAmount,
   createTransaction,
-  getAllTransactions
+  getAllTransactions,
 } from '../handlers/transactions';
 
 const restaurants: Router = express.Router();
