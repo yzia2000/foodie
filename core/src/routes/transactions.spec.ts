@@ -86,4 +86,19 @@ describe('Transactions test suite', () => {
         done(err);
       });
   });
+
+  it('Create a transaction (fail due to restaurant not open)', (done) => {
+    request(app)
+      .post('/transactions')
+      .send({
+        userId: 1,
+        itemId: 1,
+        date: '2020-12-13 23:30'
+      })
+      .expect(400)
+      .end((err) => {
+        if (err) return done(err);
+        done(err);
+      });
+  });
 });

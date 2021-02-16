@@ -8,6 +8,20 @@ export const createTransaction: RequestHandler = async (req, res) => {
     const { itemId, userId, date = new Date().toLocaleDateString() } = req.body;
 
     await client.query('BEGIN');
+
+    const weekday: number = (new Date(date)).getUTCDay();
+
+    const openHours: QueryResult = await client.query(
+      `SELECT I.id 
+        FROM Opening_Hours O INNER JOIN Items I ON I.restaurant_id = O.restaurant_id 
+        WHERE O.weekday = $1 and O.start_time <= $2 and O.end_time >= $2 and I.id = $3`,
+      [weekday, date, itemId]
+    );
+
+    if (openHours.rowCount === 0) {
+      throw new Error('Restaurant not open');
+    }
+
     const itemPriceQuery: QueryResult = await client.query(
       'SELECT price FROM Items WHERE id = $1',
       [itemId]
