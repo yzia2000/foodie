@@ -72,7 +72,7 @@ Windows users please use WSL. Docker is much faster on WSL.
 ### Frontend Development
 1. Change directory to frontend.
 ```
-cd frontend
+cd web
 ```
 
 2. Install dependencies.
@@ -91,21 +91,62 @@ Access frontend at http://localhost:3000
 ### Backend development
 1. Change directory to backend
 ```
-cd backend
+cd core
 ```
 
 2. Run the docker compose dev server
 ```
-POSTGRES_PASSWORD=postgres POSTGRES_USER=postgres POSTGRES_DB=database docker-compose up --build
+docker-compose up --build
 ```
 
 Database environment variables POSTGRES_PASSWORD, POSTGRES_USER and POSTGRES_DB need to be set
-prior the docker build.
+prior the docker build. These variables are specified in the .env file.
 
 The dev server can be accessed at http://localhost:5000.
 
 ## Deployment
-TBC
+In order to run the deployment server, use the docker-compose.prod.yml.
 
-## Testing
-TBC
+1. Change directory to backend
+```
+cd core
+```
+
+2. Run the docker compose dev server
+```
+docker-compose -f docker-compose.prod.yml up --build
+```
+
+## Linting Backend
+1. Change directory to backend
+```
+cd core
+```
+
+2. Run `npm run lint` on the docker-compose.test.yml.
+```
+docker-compose -f docker-compose.test.yml run sut npm run lint
+```
+
+## Linting Backend
+1. Change directory to backend
+```
+cd core
+```
+
+2. Run `npm run lint` on the docker-compose.test.yml.
+```
+docker-compose -f docker-compose.test.yml run sut npm run lint
+```
+
+## Testing Backend
+
+1. Change directory to backend
+```
+cd core
+```
+
+2. Run docker-compose up on the docker-compose.test.yml.
+```
+docker-compose -f docker-compose.test.yml up --build
+```

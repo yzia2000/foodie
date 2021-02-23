@@ -13,10 +13,9 @@ services:
             - ./dbscripts:/docker-entrypoint-initdb.d
 
     sut:
-        image: yzia2000/zims-classroom:test
+        image: yzia2000/foodie-api:test
         environment:
             - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-        environment:
             - NODE_ENV=test
         build:
             context: .
