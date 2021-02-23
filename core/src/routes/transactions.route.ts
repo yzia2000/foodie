@@ -7,7 +7,7 @@ import {
   getAllTransactions,
 } from '../handlers/transactions';
 
-const restaurants: Router = express.Router();
+const transactions: Router = express.Router();
 
 /**
  * @openapi
@@ -24,7 +24,7 @@ const restaurants: Router = express.Router();
  *       400:
  *         description: Bad request
  */
-restaurants.get('/', getAllTransactions);
+transactions.get('/', getAllTransactions);
 
 /**
  * @openapi
@@ -57,7 +57,7 @@ restaurants.get('/', getAllTransactions);
  *       400:
  *         description: Bad request
  */
-restaurants.get('/users/:number', listTopUsersByTransaction);
+transactions.get('/users/:number', listTopUsersByTransaction);
 
 /**
  * @openapi
@@ -90,7 +90,7 @@ restaurants.get('/users/:number', listTopUsersByTransaction);
  *       400:
  *         description: Bad request
  */
-restaurants.get('/restaurants/:number', listTopRestaurantsByTransaction);
+transactions.get('/restaurants/:number', listTopRestaurantsByTransaction);
 
 /**
  * @openapi
@@ -128,7 +128,7 @@ restaurants.get('/restaurants/:number', listTopRestaurantsByTransaction);
  *       400:
  *         description: Bad request
  */
-restaurants.get('/users/dollars/:dollars', listUsersByAmount);
+transactions.get('/users/dollars/:dollars', listUsersByAmount);
 
 /**
  * @openapi
@@ -157,6 +157,6 @@ restaurants.get('/users/dollars/:dollars', listUsersByAmount);
  *       400:
  *         description: Bad request
  */
-restaurants.post('/', createTransaction);
+transactions.post('/', createTransaction);
 
-export default restaurants;
+export default transactions;
